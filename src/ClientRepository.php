@@ -38,8 +38,21 @@ class ClientRepository
     public function findForUser($clientId, $userId)
     {
         return Client::where('id', $clientId)
-                     ->where('user_id', $userId)
-                     ->first();
+            ->where('user_id', $userId)
+            ->first();
+    }
+
+    /**
+     * Get a client instance for the given ID
+     *
+     * @param  int  $clientId
+     * @param  mixed  $userId
+     * @return \Laravel\Passport\Client|null
+     */
+    public function findFor($clientId)
+    {
+        return Client::where('id', $clientId)
+            ->first();
     }
 
     /**
@@ -51,7 +64,7 @@ class ClientRepository
     public function forUser($userId)
     {
         return Client::where('user_id', $userId)
-                        ->orderBy('name', 'asc')->get();
+            ->orderBy('name', 'asc')->get();
     }
 
     /**

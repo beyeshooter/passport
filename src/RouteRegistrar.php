@@ -72,8 +72,8 @@ class RouteRegistrar
             'middleware' => 'throttle',
         ]);
 
-        $this->router->group(['middleware' => ['web', 'auth']], function ($router) {
-            $router->get('/tokens', [
+        $this->router->group(['middleware' => 'apiPassport'], function ($router) {
+            $router->get('/tokens/{user_id}', [
                 'uses' => 'AuthorizedAccessTokenController@forUser',
             ]);
 
@@ -103,11 +103,10 @@ class RouteRegistrar
      */
     public function forClients()
     {
-        $this->router->group(['middleware' => ['web', 'auth']], function ($router) {
+        $this->router->group(['middleware' => 'apiPassport'], function ($router) {
             $router->get('/clients', [
                 'uses' => 'ClientController@forUser',
             ]);
-
             $router->post('/clients', [
                 'uses' => 'ClientController@store',
             ]);
@@ -118,6 +117,10 @@ class RouteRegistrar
 
             $router->delete('/clients/{client_id}', [
                 'uses' => 'ClientController@destroy',
+            ]);
+
+            $router->get('/clients/getClients/{user_id}', [
+                'uses' => 'ClientController@getClients',
             ]);
         });
     }

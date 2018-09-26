@@ -4,6 +4,7 @@ namespace Laravel\Passport\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\ClientRepository;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
@@ -35,6 +36,17 @@ class ClientController
     {
         $this->clients = $clients;
         $this->validation = $validation;
+    }
+
+    /**
+     * Get all of the clients for a given userId.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getClients($userId)
+    {
+        return $this->clients->activeForUser($userId)->makeVisible('secret');
     }
 
     /**
@@ -77,9 +89,9 @@ class ClientController
      */
     public function update(Request $request, $clientId)
     {
-        $client = $this->clients->findForUser($clientId, $request->user()->getKey());
+        $client = $this->clients->findFor($clientId);
 
-        if (! $client) {
+        if (!$client) {
             return new Response('', 404);
         }
 
@@ -102,14 +114,16 @@ class ClientController
      */
     public function destroy(Request $request, $clientId)
     {
-        $client = $this->clients->findForUser($clientId, $request->user()->getKey());
+        $client = $this->clients->findFor($clientId);
 
-        if (! $client) {
+        if (!$client) {
             return new Response('', 404);
         }
 
         $this->clients->delete(
             $client
         );
+
+        return response()->json(['status' => true], 200);
     }
 }
