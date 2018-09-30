@@ -27,7 +27,7 @@ class AuthorizedAccessTokenController
     }
 
     /**
-     * Get all of the authorized tokens for the authenticated user.
+     * Get all of the authorized tokens for a given user_id
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Http\Request  $request
@@ -37,6 +37,20 @@ class AuthorizedAccessTokenController
     {
         $tokens = $this->tokenRepository->forUser($user_id);
 
+        return $tokens->load('client')->filter(function ($token) {
+            return ! $token->client->firstParty() && ! $token->revoked;
+        })->values();
+    }
+
+    /**
+     * Get all of the authorized tokens for the authenticated user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function currentUser(Request $request)
+    {
+        $tokens = $this->tokenRepository->forUser($request->user()->getKey());
         return $tokens->load('client')->filter(function ($token) {
             return ! $token->client->firstParty() && ! $token->revoked;
         })->values();

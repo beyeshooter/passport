@@ -73,6 +73,12 @@ class RouteRegistrar
         ]);
 
         $this->router->group(['middleware' => 'apiPassport'], function ($router) {
+            $router->get('/tokens/currentUser', [
+                'uses' => 'AuthorizedAccessTokenController@currentUser',
+            ]);
+        });
+
+        $this->router->group(['middleware' => 'adminPassport'], function ($router) {
             $router->get('/tokens/{user_id}', [
                 'uses' => 'AuthorizedAccessTokenController@forUser',
             ]);
@@ -107,6 +113,13 @@ class RouteRegistrar
             $router->get('/clients', [
                 'uses' => 'ClientController@forUser',
             ]);
+        });
+
+        $this->router->group(['middleware' => 'adminPassport'], function ($router) {
+            $router->get('/clients/getClients/{user_id}', [
+                'uses' => 'ClientController@getClients',
+            ]);
+
             $router->post('/clients', [
                 'uses' => 'ClientController@store',
             ]);
@@ -119,9 +132,6 @@ class RouteRegistrar
                 'uses' => 'ClientController@destroy',
             ]);
 
-            $router->get('/clients/getClients/{user_id}', [
-                'uses' => 'ClientController@getClients',
-            ]);
         });
     }
 
